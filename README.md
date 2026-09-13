@@ -281,21 +281,6 @@ RECON is built with an **Adapter Pattern** that allows instant evaluation withou
 
 ---
 
-## ⏱️ Two-Minute Hackathon Presentation Script
-
-When presenting RECON to judges, use this 120-second talk track:
-
-| Time | Action on Screen | Talk Track |
-| :--- | :--- | :--- |
-| **0:00 - 0:20** | Landing Page Overview | *"Every day, companies lose revenue to flawed billing disputes. Multi-app agents fail because they trust single sources of truth. A customer email says 'I was double-charged', but the second charge might be a legitimate onboarding fee discussed in Slack. RECON reconciles reality before taking action."* |
-| **0:20 - 0:40** | Workspaces Dropdown -> Finance Operations -> **True Duplicate** | *"Here, RECON ingests evidence simultaneously: customer claim from Gmail, settled charges from Stripe, and internal context from Slack. 0 contradictions found. The LLM recommends a refund with 94% confidence."* |
-| **0:40 - 1:00** | Human Approval -> Stripe TEST Execution | *"Crucial guarantee: The LLM NEVER executes financial actions. It only recommends. I click Approve as a human operator. The deterministic Python safety engine validates 8 independent checks, executes the refund in Stripe TEST mode, verifies the resulting ledger state, and posts an audit notice to Slack."* |
-| **1:00 - 1:25** | Switch to **False Duplicate** Scenario | *"Now the real differentiator: Case 2. The customer makes the exact same claim, and Stripe shows two charges. But RECON parses Slack and finds sales engineering agreeing to an implementation fee. Contradiction flagged! Decision: NO REFUND. Financial loss prevented."* |
-| **1:25 - 1:45** | Switch to **Custom Workspace Creator** | *"Beyond finance, users can define any goal in plain English. RECON plans required apps, security scopes, and deploys live agents with automated deduplication and inbox scanning."* |
-| **1:45 - 2:00** | Reliability Benchmarks Tab | *"We stress-tested RECON against 10 adversarial attacks: outages, duplicate replay attacks, and bypass attempts. Result: 100% accuracy, 0 false refunds, and 0 unsafe actions."* |
-
----
-
 ## 📁 Repository Structure
 
 ```text
