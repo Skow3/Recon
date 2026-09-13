@@ -1,0 +1,251 @@
+================================================================================
+RECON — LIVE DEMO ENTRIES SETUP GUIDE (GMAIL + STRIPE + SLACK)
+================================================================================
+Tagline: "Reconcile reality before taking action."
+
+This document details the exact entries to configure in your live Gmail, 
+Stripe (Test Mode), and Slack accounts to perform a 100% live, end-to-end 
+dispute investigation and automated refund execution.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS:
+1. Why did it work previously without any entries?
+2. How to trigger Live Mode vs Preset Demo Mode
+3. Gmail Setup (Customer Complaint Email)
+4. Stripe Setup (Customer & 2x Test Charges)
+5. Slack Setup (Internal Context in #billing)
+6. Step-by-Step Live Demo Execution Checklist
+================================================================================
+
+
+================================================================================
+1. WHY DID IT WORK PREVIOUSLY WITHOUT ANY ENTRIES?
+================================================================================
+If your Gmail, Stripe, and Slack had no entries yet, but the investigation 
+completed with full evidence, here is why:
+
+1. Preset Demo Scenarios (01 to 06):
+   - In the dashboard, the 6 quick-demo buttons ("01 True Duplicate", 
+     "02 False Duplicate", etc.) attach a `scenario_id` (e.g., 
+     `scenario_1_true_duplicate`).
+   - RECON is architected so that any request with a preset `scenario_id` 
+     routes to the deterministic mock adapters. 
+   - This ensures hackathon judges and evaluators can test and benchmark the 
+     system immediately, with 100% deterministic reproducibility, even before 
+     connecting live credentials.
+
+2. Fallback & Graceful Degradation:
+   - If an external integration is unreachable or returns 0 records, the 
+     reconciliation engine does NOT crash. It detects 0 records, flags it as 
+     a risk, and escalates to human review ("ESCALATE_FOR_REVIEW").
+
+
+================================================================================
+2. HOW TO TRIGGER 100% TRUE [LIVE] MODE
+================================================================================
+To test with your REAL accounts instead of the preset scenario fixtures:
+
+1. Check your .env file in the project root:
+   MOCK_MODE=false
+
+2. In the RECON Web UI (http://localhost:5173):
+   - Go to the "Investigation" tab.
+   - In the "Investigation Query" box:
+     * Enter the customer name you created in Stripe/Gmail.
+     * Enter the exact customer email address.
+     * Type a natural language query (e.g., "Investigate double billing for Alex").
+   - DO NOT click the preset scenario buttons (01-06), as those reload the 
+     mock scenario fixtures.
+   - Click [ Investigate ].
+   - RECON will now connect directly to your live Gmail inbox, query your Stripe 
+     Test ledger, and read your Slack #billing channel!
+
+
+================================================================================
+3. GMAIL ENTRY (CUSTOMER DISPUTE EMAIL)
+================================================================================
+RECON connects to your Gmail using read-only OAuth credentials.
+Send an email to (or receive an email in) the connected Google account.
+
+Sender:       alex@acmecorp.com (or any email, or send it to yourself)
+Recipient:    Your connected Gmail address
+Subject:      Urgent: Duplicate billing for annual subscription ($499)
+
+Body:
+--------------------------------------------------------------------------------
+Hi Support,
+
+I just checked our company card statement and noticed that Acme Corp was 
+billed $499 twice on the same day for our annual subscription.
+
+We only authorized a single annual plan. Please investigate this double charge 
+and issue a refund of $499 for the accidental duplicate immediately.
+
+Account: Acme Corp
+Email: alex@acmecorp.com
+Amount: $499.00
+
+Thank you,
+Alex Rivera
+Acme Corp
+--------------------------------------------------------------------------------
+
+Why this matches RECON's search & parser:
+- RECON queries Gmail for: `"<customer_email>" (billing OR charge OR refund OR "charged twice")`
+- Keywords like "twice", "duplicate", "$499", and "refund" are parsed by 
+  RECON into structured customer claims:
+  [✓] "Customer reports duplicate/double billing"
+  [✓] "Customer explicitly requests a refund"
+  [✓] "Referenced charge amount: $499"
+
+
+================================================================================
+4. STRIPE ENTRY (TEST MODE CHARGES)
+================================================================================
+Open your Stripe Dashboard (https://dashboard.stripe.com).
+IMPORTANT: Ensure the toggle in the top-right is switched to "TEST MODE"!
+
+Step 4.1: Create the Customer
+- Navigate to: Customers -> Add Customer
+- Name:  Acme Corp
+- Email: alex@acmecorp.com
+- Description: Annual Enterprise Account
+- Click "Add customer". Note the Customer ID (e.g., cus_xyz...).
+
+Step 4.2: Create Charge #1 (The Legitimate Annual Plan)
+- In the Customer details page, click "Create payment" (or Payments -> Create payment)
+- Customer: Acme Corp (alex@acmecorp.com)
+- Amount:   $499.00 USD
+- Statement descriptor / Description: Annual Subscription 2026 - Acme Corp
+- Payment method: Use Stripe test card `4242 4242 4242 4242`, exp: `12/28`, cvc: `123`
+- Click "Submit payment". Status must be "Succeeded".
+
+Step 4.3: Create Charge #2 (The Accidental Duplicate)
+- Create a second payment for the same customer:
+- Customer: Acme Corp (alex@acmecorp.com)
+- Amount:   $499.00 USD
+- Description: Annual Subscription 2026 - Acme Corp (Duplicate Webhook Retry)
+- Payment method: Use Stripe test card `4242 4242 4242 4242`
+- Click "Submit payment". Status must be "Succeeded".
+
+Verification in Stripe:
+- Under Customers -> alex@acmecorp.com -> Payments, you should see 2 payments 
+  of $499.00 USD each, both marked "Succeeded", and neither refunded yet.
+
+
+================================================================================
+5. SLACK ENTRY (INTERNAL CONTEXT IN #billing)
+================================================================================
+Open your Slack workspace where your RECON Bot is installed.
+
+Step 5.1: Channel Configuration
+- Ensure a public channel named `#billing` exists (or create one: `#billing`).
+- Invite your bot to the channel by typing inside `#billing`:
+  /invite @RECON
+  (replace @RECON with your bot's app name).
+
+Step 5.2: Post Internal Context Message
+As any user in the `#billing` channel, post this message:
+
+--------------------------------------------------------------------------------
+Hey team, regarding Acme Corp (alex@acmecorp.com): their signup webhook had a 
+network timeout yesterday and retried, creating an accidental duplicate 
+charge of $499. They only have one active subscription. If they reach out, 
+please refund the second charge.
+--------------------------------------------------------------------------------
+
+Why this matches RECON's reconciliation engine:
+- RECON's Slack adapter searches `#billing` for the customer name/email and 
+  billing keywords.
+- Phrases like "accidental", "only have one", and "please refund" corroborate 
+  the customer's claim that only 1 charge was expected.
+- Result: System verifies that the dispute is a TRUE duplicate, not a legitimate 
+  second fee.
+
+Post-Execution Verification:
+- When you click [ Approve refund ] in RECON, the safety engine validates the 
+  action, executes the refund via Stripe API, and automatically posts a verified 
+  delivery receipt directly to `#billing`!
+
+
+================================================================================
+6. COMPLETE LIVE DEMO RUNTHROUGH
+================================================================================
+
+1. Start RECON:
+   ./run.sh
+
+2. Open Dashboard:
+   http://localhost:5173
+
+3. Verify Badges in Top Bar:
+   - Gmail:     CONNECTED
+   - Stripe:    TEST MODE
+   - Slack:     CONNECTED
+   - Env:       LIVE
+
+4. Run Investigation:
+   - Customer Name:  Shivendra (or Acme Corp)
+   - Customer Email: shiv230102037@iiitmanipur.ac.in (or alex@acmecorp.com)
+   - User Request:   Investigate duplicate $499 annual subscription charge for shiv230102037@iiitmanipur.ac.in
+   - Click [ Investigate ]
+
+5. What You Will See in the Live Result:
+   - Evidence Dossier -> Gmail:
+     Shows your real email from your inbox, with parsed claims.
+   - Evidence Dossier -> Stripe:
+     Shows the 2 settled $499 charges retrieved live from Stripe Test API.
+   - Evidence Dossier -> Slack:
+     Shows the team confirmation message retrieved live from `#billing`.
+   - Cross-System Reconciliation:
+     Compares records: 2 settled charges vs 1 expected subscription.
+   - Recommendation:
+     "REFUND RECOMMENDED" (Confidence: 94%)
+   - Click [ Approve refund ($499.00) ] -> [ Confirm refund ].
+   - RECON executes the refund live on Stripe Test Mode.
+   - State Verified:
+     Shows real Stripe Refund ID (`re_...`) and automatically posts the verified 
+     audit notification to your live `#billing` Slack channel!
+
+================================================================================
+7. UI INTERFACE SETUP & USAGE GUIDE
+================================================================================
+
+The RECON Investigation interface now provides explicit, editable inputs for 
+both your target customer and query:
+
+1. TOP SCENARIO BAR:
+   [Dispute Scenarios]   [ ● Custom Live Dispute ]
+   - Clicking "[ ● Custom Live Dispute ]" immediately clears any preset test 
+     fixtures and populates your live email (shiv230102037@iiitmanipur.ac.in).
+   - Clicking any numbered card (01-06) loads that preset scenario benchmark.
+
+2. INVESTIGATION PARAMETERS PANEL:
+   - Header Badge:
+     * When running live: displays green pill "100% Live Mode (Real Inbox & Ledger)".
+     * When in demo: displays "Preset Demo Case" + "[Switch to Custom Live]" button.
+
+   - Target Account Inputs:
+     * [ Customer / Account Name ]:
+       Type: "Shivendra" (or your customer's name)
+     * [ Customer Email / Identifier ]:
+       Type: "shiv230102037@iiitmanipur.ac.in"
+
+   - Investigation Query Box:
+     * [ Investigation Query / Complaint Summary ]:
+       Type your prompt, e.g.:
+       "Investigate billing dispute for shiv230102037@iiitmanipur.ac.in regarding duplicate $499 charge"
+     * Click [ Investigate ].
+
+3. EVIDENCE MATRIX & RECONCILIATION:
+   - Switch between horizontal tabs: [ Gmail ] | [ Stripe ] | [ Slack ].
+   - Inspect cross-system contradiction analysis table.
+
+4. DELIBERATE TWO-STEP APPROVAL:
+   - When "REFUND RECOMMENDED" appears, click:
+     [ Approve refund ($499.00) ]
+   - A deliberate confirmation dialog appears:
+     "Approve refund? RECON will create a $499.00 TEST MODE refund in Stripe..."
+   - Click [ Confirm refund ].
+   - RECON validates the 8 safety checks, executes the refund, and verifies state.
+================================================================================
