@@ -894,7 +894,6 @@ The goal is to demonstrate the **agent architecture**, not infrastructure comple
       </p>
     </td>
 
-```
 <td width="50%" valign="top">
   <h4 align="center">2. Finance Operations</h4>
   <img src="assets/recon-finance-investigation.png" alt="Finance Operations Investigation" width="100%" style="border-radius: 6px; border: 1px solid #e1e4e8;" onerror="this.onerror=null; this.src='https://placehold.co/800x480/161b22/c9d1d9?text=Multi-App+Evidence+Matrix+%26+Reconciliation&font=Montserrat';" />
@@ -907,7 +906,6 @@ The goal is to demonstrate the **agent architecture**, not infrastructure comple
     </sub>
   </p>
 </td>
-```
 
   </tr>
 
@@ -925,7 +923,6 @@ The goal is to demonstrate the **agent architecture**, not infrastructure comple
       </p>
     </td>
 
-```
 <td width="50%" valign="top">
   <h4 align="center">4. Custom Agent Natural Goal Planner</h4>
   <img src="assets/recon-custom-workspace.png" alt="Custom Workspace Creator" width="100%" style="border-radius: 6px; border: 1px solid #e1e4e8;" onerror="this.onerror=null; this.src='https://placehold.co/800x480/161b22/c9d1d9?text=Natural+Goal+Intent+Planning+%26+Workflow+Generation&font=Montserrat';" />
@@ -938,7 +935,6 @@ The goal is to demonstrate the **agent architecture**, not infrastructure comple
     </sub>
   </p>
 </td>
-```
 
   </tr>
 
@@ -956,7 +952,6 @@ The goal is to demonstrate the **agent architecture**, not infrastructure comple
       </p>
     </td>
 
-```
 <td width="50%" valign="top">
   <h4 align="center">6. Adversarial Reliability Benchmark</h4>
   <img src="assets/recon-reliability-benchmark.png" alt="Reliability Benchmark" width="100%" style="border-radius: 6px; border: 1px solid #e1e4e8;" onerror="this.onerror=null; this.src='https://placehold.co/800x480/161b22/c9d1d9?text=Adversarial+Reliability+Benchmark&font=Montserrat';" />
@@ -970,7 +965,6 @@ The goal is to demonstrate the **agent architecture**, not infrastructure comple
     </sub>
   </p>
 </td>
-```
 
   </tr>
 </table>
