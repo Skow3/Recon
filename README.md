@@ -35,10 +35,10 @@
 <!-- Replace the link below with your YouTube / Loom / MP4 demo URL     -->
 <!-- ================================================================= -->
 <div align="center">
-  <a href="https://youtu.be/your-demo-video-link" target="_blank">
+  <a href="https://youtu.be/rLhXPYaVDDY?si=RLJcJj0Jrbw7O46C" target="_blank">
     <img src="assets/recon-demo-preview.png" alt="Watch the RECON Demo Video" width="100%" style="border-radius: 8px; border: 1px solid #30363d; max-width: 820px;" onerror="this.onerror=null; this.src='https://placehold.co/1200x630/0d1117/58a6ff?text=Watch+RECON+Demo+Video+(Click+to+Play)&font=Montserrat';" />
   </a>
-  <p><em>▶️ <strong><a href="https://youtu.be/your-demo-video-link">Click here to watch the full 2-minute live demo on YouTube</a></strong></em></p>
+  <p><em>▶️ <strong><a href="https://youtu.be/rLhXPYaVDDY?si=RLJcJj0Jrbw7O46C">Click here to watch the full 2-minute live demo on YouTube</a></strong></em></p>
 </div>
 
 <br />
